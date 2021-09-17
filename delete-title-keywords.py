@@ -93,7 +93,7 @@ class MyApp(App):
             "请将delete.txt拖动到此窗口，然后按回车键。", 
             default="./test/delete.txt")
         keyword_list = self.readTxtToList(keyword_filename)
-        keyword_list = [re.compile(re.escape(keyword), re.IGNORECASE) for keyword in keyword_list] # all keyword to re expression
+        keyword_list = [re.compile(keyword, re.IGNORECASE) for keyword in keyword_list] # all keyword to re expression
         #pprint(keyword_list)
         
         input_filename = self.input(
@@ -110,13 +110,13 @@ class MyApp(App):
         
         for line in data:
             for expression in keyword_list:
-                res = expression.sub('', line['title'])
+                res = expression.sub("", line['title'])
             res = multi_space_expression.sub(' ', res)
             
             if len(res) < len(line['title']):
                 line['new_title'] = res
             else:
-                line['new_title'] = None
+                line['new_title'] = line['title'] # copy title
  
             self.printCounter("%s" % (line['title']))
                             
