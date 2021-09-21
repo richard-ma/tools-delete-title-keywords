@@ -93,9 +93,9 @@ class MyApp(App):
             "请将delete.txt拖动到此窗口，然后按回车键。", 
             default="./test/delete.txt")
         keyword_list = self.readTxtToList(keyword_filename)
-        keyword_list = [re.compile(keyword, re.IGNORECASE) for keyword in keyword_list] # all keyword to re expression
-        #pprint(keyword_list)
-        
+        # pprint(keyword_list)
+        expressions = [re.compile(keyword, re.IGNORECASE) for keyword in keyword_list] # all keyword to re expression
+
         input_filename = self.input(
             "请将csv文件拖动到此窗口，然后按回车键。", 
             default="./test/product_data_cscart.csv")
@@ -109,16 +109,19 @@ class MyApp(App):
         multi_space_expression = re.compile(r' +')
         
         for line in data:
-            for expression in keyword_list:
-                res = expression.sub("", line['title'])
+            res = line['title']
+            filter_keyword = list()
+            l = len(res)
+            for expression in expressions:
+                res = expression.sub('', res)
+                if len(res) < l:
+                    filter_keyword.append(expression.pattern)
+                l = len(res)
+                
             res = multi_space_expression.sub(' ', res)
+            line['new_title'] = res
             
-            if len(res) < len(line['title']):
-                line['new_title'] = res
-            else:
-                line['new_title'] = line['title'] # copy title
- 
-            self.printCounter("%s" % (line['title']))
+            self.printCounter(",".join(filter_keyword)) 
                             
         fieldnames = list(data[0].keys())
         #pprint(fieldnames)
